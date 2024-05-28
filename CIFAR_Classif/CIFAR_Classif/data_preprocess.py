@@ -1,7 +1,4 @@
 import pickle
-from skimage.feature import hog
-from skimage import color
-        
 
 def unpickle(file):
     with open(file, 'rb') as fo:
