@@ -38,7 +38,9 @@ lint:
 format:
 	black --config pyproject.toml CIFAR_Classif
 
-
+## Run tests
+.PHONY: test
+	$(PYTHON_INTERPRETER) setup.py pytest
 
 
 ## Set up python interpreter environment
@@ -46,9 +48,13 @@ format:
 create_environment:
 	@bash -c "if [ ! -z `which virtualenvwrapper.sh` ]; then source `which virtualenvwrapper.sh`; mkvirtualenv $(PROJECT_NAME) --python=$(PYTHON_INTERPRETER); else mkvirtualenv.bat $(PROJECT_NAME) --python=$(PYTHON_INTERPRETER); fi"
 	@echo ">>> New virtualenv created. Activate with:\nworkon $(PROJECT_NAME)"
-	
 
 
+## Compile Python library
+.PHONY: compile
+compile:
+	$(PYTHON_INTERPRETER) CIFAR_Classif/setup.py bdist_wheel
+	pip install dist/CIFAR_Classif-0.0.1-py3-none-any.whl
 
 #################################################################################
 # PROJECT RULES                                                                 #
