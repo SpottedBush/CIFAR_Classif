@@ -4,13 +4,44 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-A classification for the CIFAR dataset
+## Description
 
+This project aims to classify the images from the CIFAR dataset.
+
+## Features
+
+- Generic Class for benchmarking multiple classifiers
+    - SVC
+    - KNN
+    - Logistic Regression
+    - Random Forest
+    - SVM
+    - Decision Tree
+    - gradient_boosting
+
+- Feature 2
+- Feature 3
+
+## Requirements
+
+- Python 3.6+
+- Make
+
+## Installation
+
+To install the project, you need to run the following commands:
+
+```bash
+git clone
+cd CIFAR_Classif
+mkvirtualenv cifar_classif
+pip install -r requirements.txt
+make build_lib
+```
 ## Project Organization
 
 ```
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
+├── Makefile           <- Makefile with convenience commands like `make data` or `make build_lib`
 ├── README.md          <- The top-level README for developers using this project.
 ├── data
 │   ├── external       <- Data from third party sources.
@@ -22,12 +53,9 @@ A classification for the CIFAR dataset
 │
 ├── models             <- Trained and serialized models, model predictions, or model summaries
 │
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
+├── notebooks          <- Jupyter notebooks.
 │
 ├── pyproject.toml     <- Project configuration file with package metadata for CIFAR_Classif
-│                         and configuration for tools like black
 │
 ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
 │
@@ -59,4 +87,3 @@ A classification for the CIFAR dataset
 ```
 
 --------
-

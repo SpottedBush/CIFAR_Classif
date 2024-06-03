@@ -4,6 +4,32 @@ Just a simple metrics module to compare the different computed models
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+
+from CIFAR_Classif.generic_classifier import GenericClassifier
+
+def benchmark_model(df, y_col):
+    X_train, X_test, y_train, y_test = train_test_split(df.drop(y_col, axis=1), df[y_col], test_size=0.2, random_state=42)
+    svc = GenericClassifier(X_train, y_train, X_test, y_test, kernel='svc')
+    logistic_reg = GenericClassifier(X_train, y_train, X_test, y_test, kernel='logistic_regression')
+    random_forest = GenericClassifier(X_train, y_train, X_test, y_test, kernel='random_forest')
+    knn = GenericClassifier(X_train, y_train, X_test, y_test, kernel='knn')
+    decision_tree = GenericClassifier(X_train, y_train, X_test, y_test, kernel='decision_tree')
+    gradient_boosting = GenericClassifier(X_train, y_train, X_test, y_test, kernel='gradient_boosting')
+    
+    # Training and scoring
+    print("------SVC------")
+    svc.training_score(verbose=True)
+    print("------Logistic Regression------")
+    logistic_reg.training_score(verbose=True)
+    print("------Random Forest------")
+    random_forest.training_score(verbose=True)
+    print("------KNN------")
+    knn.training_score(verbose=True)
+    print("------Decision Tree------")
+    decision_tree.training_score(verbose=True)
+    print("------Gradient Boosting------")
+    gradient_boosting.training_score(verbose=True)
 
 # ------Quantitative metrics------
 

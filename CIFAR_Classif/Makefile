@@ -4,7 +4,7 @@
 
 PROJECT_NAME = CIFAR_Classif
 PYTHON_VERSION = 3.10
-PYTHON_INTERPRETER = python
+PYTHON_INTERPRETER = python3
 
 #################################################################################
 # COMMANDS                                                                      #
@@ -50,11 +50,13 @@ create_environment:
 	@echo ">>> New virtualenv created. Activate with:\nworkon $(PROJECT_NAME)"
 
 
-## Compile Python library
-.PHONY: compile
-compile:
-	$(PYTHON_INTERPRETER) CIFAR_Classif/setup.py bdist_wheel
-	pip install dist/CIFAR_Classif-0.0.1-py3-none-any.whl
+## Build the library
+.PHONY: build_lib
+build_lib:
+	$(PYTHON_INTERPRETER) setup.py develop
+	$(PYTHON_INTERPRETER) setup.py sdist --format=zip
+	pip install dist/cifar_classif-0.0.1.zip
+
 
 #################################################################################
 # PROJECT RULES                                                                 #
