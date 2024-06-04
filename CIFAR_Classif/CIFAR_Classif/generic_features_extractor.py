@@ -1,16 +1,23 @@
 import numpy as np
-from skimage.color import rgb2gray
 from skimage.feature import hog, local_binary_pattern
 from sklearn.decomposition import PCA
 
 
 class GenericFeaturesExtractor:
     def __init__(self, kernel="hog"):
-        self.str_kernel = kernel
+        """Initialize the features extractor with the given kernel.
+        Args:
+            kernel (str, optional): Chose between ["hog", "lbp"]. Defaults to "hog".
+        """
+        if kernel == "hog":
+            self.kernel = (lambda img: hog(img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1)))
+        elif kernel == "lbp":
+            self.kernel = (lambda img: local_binary_pattern(img, 8, 1, method="uniform"))
+        else:
+            raise ValueError("Invalid kernel. Choose from: ['hog', 'lbp']")
 
-    def extract_features(
-        self, X, dim_reduction=False, features_selection=False, threshold=0.1, n_components=2
-    ):
+
+    def extract_features(self, X, dim_reduction=False, features_selection=False, threshold=0.1, n_components=2):
         """
         X: list of images
         dim_reduction: bool, default=False
@@ -22,27 +29,11 @@ class GenericFeaturesExtractor:
         You only need to specify the threshold if features_selection is True.
         """
         extracted_features = []
-        if self.str_kernel == "hog":
-            for img in X:
-                # Converting the image to grayscale to extract HOG features
-                fd = hog(
-                    rgb2gray(img), orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1)
-                )
-                extracted_features.append(fd)
-
-        if self.str_kernel == "lbp":
-            for img in X:
-                # Converting the image to grayscale to extract LBP features
-                lbp = local_binary_pattern(rgb2gray(img), 8, 1, method="uniform")
-                extracted_features.append(lbp)
-
-        else:
-            raise ValueError("Invalid kernel. Choose from: ['hog', 'lbp']")
+        for img in X:
+            extracted_features.append(self.kernel(img))
 
         if dim_reduction:
-            pca = PCA(
-                n_components=n_components
-            )  # Specify the number of components you want to keep
+            pca = PCA(n_components=n_components)
             extracted_features = pca.fit_transform(extracted_features)
 
         if features_selection:

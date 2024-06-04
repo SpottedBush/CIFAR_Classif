@@ -30,7 +30,6 @@ This project aims to classify the images from the CIFAR dataset.
 ## Installation
 
 To install the project, you need to run the following commands:
-
 ```bash
 git clone
 cd CIFAR_Classif
@@ -38,6 +37,9 @@ mkvirtualenv cifar_classif
 pip install -r requirements.txt
 make build_lib
 ```
+
+In order to make the notebook work, you will need to add the CIFAR dataset to the path `data/cifar-10-batches-py`, it can be downloaded here : [cifar-10-batches-py](https://www.cs.toronto.edu/~kriz/cifar.html)  
+
 ## Project Organization
 
 ```

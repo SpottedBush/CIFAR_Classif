@@ -1,35 +1,48 @@
 """
-Just a simple metrics module to compare the different computed models
+Just some simple metrics module to compare the different computed models
 """
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split
 
 from CIFAR_Classif.generic_classifier import GenericClassifier
+from CIFAR_Classif.generic_features_extractor import GenericFeaturesExtractor
 
-def benchmark_model(df, y_col):
-    X_train, X_test, y_train, y_test = train_test_split(df.drop(y_col, axis=1), df[y_col], test_size=0.2, random_state=42)
-    svc = GenericClassifier(X_train, y_train, X_test, y_test, kernel='svc')
-    logistic_reg = GenericClassifier(X_train, y_train, X_test, y_test, kernel='logistic_regression')
-    random_forest = GenericClassifier(X_train, y_train, X_test, y_test, kernel='random_forest')
-    knn = GenericClassifier(X_train, y_train, X_test, y_test, kernel='knn')
-    decision_tree = GenericClassifier(X_train, y_train, X_test, y_test, kernel='decision_tree')
-    gradient_boosting = GenericClassifier(X_train, y_train, X_test, y_test, kernel='gradient_boosting')
-    
-    # Training and scoring
-    print("------SVC------")
-    svc.training_score(verbose=True)
-    print("------Logistic Regression------")
-    logistic_reg.training_score(verbose=True)
-    print("------Random Forest------")
-    random_forest.training_score(verbose=True)
-    print("------KNN------")
-    knn.training_score(verbose=True)
-    print("------Decision Tree------")
-    decision_tree.training_score(verbose=True)
-    print("------Gradient Boosting------")
-    gradient_boosting.training_score(verbose=True)
+# ------Benchmarks------
+
+def benchmark_feature_extractors(X_train, X_test, feature_extractor_list = ["hog", 'lbp']):
+    """Benchmark different feature extractors for a specific dataset.
+
+    Args:
+        X_train (pd.Dataframe): Training data.
+        y_train (pd.Dataframe): Training labels.
+        X_test (pd.Dataframe): Testing data.
+        y_test (pd.Dataframe): Testing labels.
+        feature_extractor_list ([strings]): Feature extractor to use. default=["hog", 'lbp']. Must be one of the following list: ["hog", 'lbp'].
+    """
+    X_train_features = {}
+    X_test_features = {}
+    for feature_extractor in feature_extractor_list:
+        generic_features_extractor = GenericFeaturesExtractor(kernel=feature_extractor)
+        X_train_features[feature_extractor] = generic_features_extractor.extract_features(X_train)
+        X_test_features[feature_extractor] = generic_features_extractor.extract_features(X_test)
+    return X_train_features, X_test_features 
+
+def benchmark_models(X_train, y_train, X_test, y_test, model_list = ["svc", 'logistic_regression', 'knn']):
+    """Benchmark different classifiers for a specific dataset.
+
+    Args:
+        X_train (pd.Dataframe): Training data.
+        y_train (pd.Dataframe): Training labels.
+        X_test (pd.Dataframe): Testing data.
+        y_test (pd.Dataframe): Testing labels.
+        model_list ([strings]): Model to use. default=["svc", 'logistic_regression', 'knn']. Must be one of the following list: ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting'].
+    """
+    for model in model_list:
+        generic_classifier = GenericClassifier(kernel=model)
+        # Training and scoring
+        print(f"------{model}------")
+        generic_classifier.training_score(X_train, y_train, X_test, y_test, verbose=True)
 
 # ------Quantitative metrics------
 

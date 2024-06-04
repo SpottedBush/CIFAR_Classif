@@ -1,6 +1,6 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
@@ -10,66 +10,70 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 class GenericClassifier:
-    def __init__(self, X, y, kernel="SVC"):
+    """A generic classifier class that can be used to train and evaluate different classifiers."""
+    def __init__(self, kernel="SVC"):
+        """Initialize the classifier with the given data and kernel.
+
+        Args:
+            X (pd.Dataframe): Data.
+            y (pd.Dataframe): Labels.
+            kernel (str, optional): Must be one of the following list: ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']. Defaults to "svc".
+        """
         if kernel not in ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']:
             raise ValueError("Invalid kernel. Choose from: ['svc', 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']")
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        self.X_train = X_train
-        self.X_test = X_test
-        self.y_train = y_train
-        self.y_test = y_test
         self.str_kernel = kernel
         if kernel == "svc":
             self.kernel = SVC()
         elif kernel == 'logistic_regression':
-            self.model = LogisticRegression()
+            self.kernel = LogisticRegression()
         elif kernel == 'random_forest':
-            self.model = RandomForestClassifier()
+            self.kernel = RandomForestClassifier()
         elif kernel == 'knn':
-            self.model = KNeighborsClassifier()
+            self.kernel = KNeighborsClassifier()
         elif kernel == 'decision_tree':
-            self.model = DecisionTreeClassifier()
+            self.kernel = DecisionTreeClassifier()
         elif kernel == 'gradient_boosting':
-            self.model = GradientBoostingClassifier()
+            self.kernel = GradientBoostingClassifier()
         else:
             raise ValueError("Invalid kernel")
 
     # Classic classifier methods
-    def fit(self):
-        return self.kernel.fit(self.X_train, self.y_train)
+    def fit(self, X_train, y_train):
+        return self.kernel.fit(X_train, y_train)
 
-    def transform(self):
-        return self.kernel.transform(self.X_test)
+    def transform(self, X_test):
+        return self.kernel.transform(X_test)
 
-    def fit_transform(self):
-        return self.kernel.fit_transform(self.X_train, self.y_train)
+    def fit_transform(self, X_train, y_train):
+        return self.kernel.fit_transform(X_train, y_train)
 
-    def predict(self):
-        return self.kernel.predict(self.X_test)
+    def predict(self, X_test):
+        return self.kernel.predict(X_test)
 
-    def compute_accuracy(self, verbose=False):
-        y_pred = self.kernel.predict(self.X_test)
-        accuracy = accuracy_score(self.y_test, y_pred)
+    def compute_accuracy(self, X_test, y_test, verbose=False):
+        y_pred = self.kernel.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
         if verbose:
             print(f"{self.str_kernel} accuracy is:", accuracy)
         return accuracy
 
-    def grid_search(self, param_grid, verbose=False):
+    def grid_search(self, param_grid, X_train, y_train, verbose=False):
+        """Perform grid search on the classifier."""
         grid_search = GridSearchCV(self.kernel, param_grid, cv=5)
-        grid_search.fit(self.X_train, self.y_train)
+        grid_search.fit(X_train, y_train)
         best_params = grid_search.best_params_
         best_score = grid_search.best_score_
         if verbose:
             print("Best Parameters:", best_params)
             print("Best Score:", best_score)
-        return best_params, best_score
+        return grid_search
 
-    def training_score(self, verbose: bool = True):
-        self.model.fit(self.X_train, self.y_train)
-        y_pred = self.model.predict(self.X_test)
+    def training_score(self, X_train, y_train, X_test, y_test, verbose: bool = True):
+        self.fit(X_train, y_train)
+        y_pred = self.predict(X_test)
 
-        accuracy = accuracy_score(self.y_test, y_pred)
-        report = classification_report(self.y_test, y_pred)
+        accuracy = accuracy_score(y_test, y_pred)
+        report = classification_report(y_test, y_pred)
 
         if verbose:
             print(f"Accuracy: {accuracy}")
