@@ -28,7 +28,7 @@ def benchmark_feature_extractors(X_train, X_test, feature_extractor_list = ["hog
         X_test_features[feature_extractor] = generic_features_extractor.extract_features(X_test)
     return X_train_features, X_test_features 
 
-def benchmark_models(X_train, y_train, X_test, y_test, model_list = ["svc", 'logistic_regression', 'knn']):
+def benchmark_models(X_train, y_train, X_test, y_test, model_list = ["svc", 'logistic_regression', 'knn'], verbose=True):
     """Benchmark different classifiers for a specific dataset.
 
     Args:
@@ -38,11 +38,16 @@ def benchmark_models(X_train, y_train, X_test, y_test, model_list = ["svc", 'log
         y_test (pd.Dataframe): Testing labels.
         model_list ([strings]): Model to use. default=["svc", 'logistic_regression', 'knn']. Must be one of the following list: ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting'].
     """
+    accuracy_list, report_list = [], []
     for model in model_list:
         generic_classifier = GenericClassifier(kernel=model)
         # Training and scoring
-        print(f"------{model}------")
-        generic_classifier.training_score(X_train, y_train, X_test, y_test, verbose=True)
+        if verbose:
+            print(f"------{model}------")
+        accuracy, report = generic_classifier.training_score(X_train, y_train, X_test, y_test, verbose=verbose)
+        accuracy_list.append(accuracy)
+        report_list.append(report)
+    return accuracy_list, report_list
 
 # ------Quantitative metrics------
 

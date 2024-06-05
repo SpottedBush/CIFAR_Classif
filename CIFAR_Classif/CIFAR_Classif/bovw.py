@@ -47,8 +47,11 @@ def get_bovw_features(kps, descs, n_clusters):
     visual_word_pos = 0 # Position of the visual word
 
     for i in range(N):
+        if isinstance(descs[i], type(None)):
+            descs[i] = [[0 for _ in range(128)]]
         feature_vector_curr = np.zeros(bag.n_clusters, dtype=np.float32)
-        word_vector = bag.predict(descs[i])
+        curr_desc = np.asarray(descs[i], dtype=np.float32)
+        word_vector = bag.predict(curr_desc)
         
         # For each unique visual word
         for word in np.unique(word_vector):
