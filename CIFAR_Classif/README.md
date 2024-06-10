@@ -26,6 +26,7 @@ This project aims to classify the images from the CIFAR dataset.
 
 - Python 3.6+
 - Make
+- virtualenv
 
 ## Installation
 

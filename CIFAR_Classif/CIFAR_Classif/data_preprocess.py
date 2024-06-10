@@ -11,7 +11,7 @@ def preprocess(X):
     new_X = []
     for idx in range(len(X)):
         img = X[idx].reshape(3, 32, 32).transpose(1, 2, 0) # Reshape the image to 32x32x3
-        # img = rgb2gray(img)
+        # img = rgb2gray(img) We removed Grayscale conversion because we lost information
         img = cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX).astype('uint8') # Used to compute SIFT features
         new_X.append(img) # Convert the image to grayscale
     return new_X

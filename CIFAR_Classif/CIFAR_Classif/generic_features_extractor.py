@@ -10,14 +10,13 @@ class GenericFeaturesExtractor:
             kernel (str, optional): Chose between ["hog", "lbp"]. Defaults to "hog".
         """
         if kernel == "hog":
-            self.kernel = (lambda img: hog(img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1)))
+            self.kernel = (lambda img: hog(img, orientations=8, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, channel_axis=-1))
         elif kernel == "lbp":
             self.kernel = (lambda img: local_binary_pattern(img, 8, 1, method="uniform"))
         else:
             raise ValueError("Invalid kernel. Choose from: ['hog', 'lbp']")
 
-
-    def extract_features(self, X, dim_reduction=False, features_selection=False, threshold=0.1, n_components=2):
+    def extract_features(self, X, features_selection=False, threshold=0.1):
         """
         X: list of images
         dim_reduction: bool, default=False
@@ -31,17 +30,16 @@ class GenericFeaturesExtractor:
         extracted_features = []
         for img in X:
             extracted_features.append(self.kernel(img))
-
-        if dim_reduction:
-            pca = PCA(n_components=n_components)
-            extracted_features = pca.fit_transform(extracted_features)
-
+            
         if features_selection:
-            # Calculate the variance of each feature
-            variances = np.var(extracted_features, axis=0)
-            # Find the indices of features with low variance
-            low_variance_indices = np.where(variances < threshold)[0]
-            # Remove the features with low variance
-            extracted_features = np.delete(extracted_features, low_variance_indices, axis=1)
+            extracted_features = apply_feature_selection(extracted_features, threshold=threshold)
 
         return extracted_features
+    
+def apply_feature_selection(X, threshold=0.1):
+    # Calculate the variance of each feature
+    variances = np.var(X, axis=0)
+    # Find the indices of features with low variance
+    low_variance_indices = np.where(variances < threshold)[0]
+    # Remove the features with low variance
+    return np.delete(X, low_variance_indices, axis=1)

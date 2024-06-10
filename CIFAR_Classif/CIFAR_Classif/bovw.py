@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
-from sklearn.cluster import KMeans
 
-def get_SIFT_kp_and_desc(imgs):
+def get_SIFT_kp_and_desc(imgs, dim_out=64):
     """given a list of images, return the keypoints and descriptors of each image
 
     Args:
@@ -18,50 +17,49 @@ def get_SIFT_kp_and_desc(imgs):
     for img in imgs:
         # extract keypoints and descriptors for each image
         img_keypoints, img_descriptors = extractor.detectAndCompute(img, None)
+        img_descriptors = img_descriptors if img_descriptors is not None else np.array([]).reshape(0, 128)
+        img_descriptors = reduce_descs_dimensions(img_descriptors, n_components=dim_out)
         keypoints.append(img_keypoints)
         descriptors.append(img_descriptors)
+        
     return keypoints, descriptors
 
+def reduce_descs_dimensions(X, n_components=64):
+    X = X.astype(np.float32)
+    train_mean = np.mean(X)
+    X = X - train_mean # zero-center
 
-def get_bovw_features(kps, descs, n_clusters):
+    train_cov = np.dot(X.T, X)
+    eigvals, eigvecs = np.linalg.eig(train_cov)
+    perm = eigvals.argsort() # sort by increasing eigenvalue
+    pca_transform = eigvecs[:, perm[128 - n_components:128]] # eigenvectors for the n_components last eigenvalues
+    return X @ pca_transform
+
+def get_bovw_features(imgs, bag):
     """Quite explicit function name
 
     Args:
-        kps: list of keypoints
-        descs : list of descriptors
-        n_clusters : hyperparameter for KMeans
-
+        imgs (list): list of images
+        bag (KMeans): KMeans object, must be fitted
     Returns:
         list: list of feature vectors
     """
-    
-    descs_without_none = [desc for desc in descs if desc is not None]
-    
-    descs_stack = np.vstack(descs_without_none, dtype=np.float32)
-    bag = KMeans(n_clusters=n_clusters, random_state=42).fit(descs_stack)
-    
-    N = len(kps) # Number of images
+    N = len(imgs) # Number of images
     K = bag.n_clusters # Number of visual words
     
     feature_vector = np.zeros((N, K))
-    visual_word_pos = 0 # Position of the visual word
 
     for i in range(N):
-        if isinstance(descs[i], type(None)):
-            descs[i] = [[0 for _ in range(128)]]
-        feature_vector_curr = np.zeros(bag.n_clusters, dtype=np.float32)
-        curr_desc = np.asarray(descs[i], dtype=np.float32)
-        word_vector = bag.predict(curr_desc)
+        feature_vector_curr = np.zeros(K, dtype=np.float128)
         
+        word_vector = bag.predict(imgs[i].astype(np.float128).reshape(1, -1)) # Predicts the visual word for each image and converts it to const double
         # For each unique visual word
-        for word in np.unique(word_vector):
+        for word in np.unique(bag.cluster_centers_):
             res = list(word_vector).count(word)
             feature_vector_curr[word] = res # Increments histogram for that word
-        
+
         # Normalizes the current histogram
         cv2.normalize(feature_vector_curr, feature_vector_curr, norm_type=cv2.NORM_L2)
-
-        feature_vector[visual_word_pos] = feature_vector_curr # Assigned the current histogram to the feature vector
-        visual_word_pos += 1 # Increments the position of the visual word
+        feature_vector[i] = feature_vector_curr # Assigned the current histogram to the feature vector
 
     return feature_vector

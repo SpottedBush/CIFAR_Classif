@@ -6,12 +6,12 @@ from sklearn.svm import SVC
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.tree import DecisionTreeClassifier
-
+from sklearn.neural_network import MLPClassifier
 
 
 class GenericClassifier:
     """A generic classifier class that can be used to train and evaluate different classifiers."""
-    def __init__(self, kernel="SVC"):
+    def __init__(self, kernel="svc"):
         """Initialize the classifier with the given data and kernel.
 
         Args:
@@ -19,13 +19,13 @@ class GenericClassifier:
             y (pd.Dataframe): Labels.
             kernel (str, optional): Must be one of the following list: ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']. Defaults to "svc".
         """
-        if kernel not in ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']:
+        if kernel not in ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting', 'mlp']:
             raise ValueError("Invalid kernel. Choose from: ['svc', 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']")
         self.str_kernel = kernel
         if kernel == "svc":
-            self.kernel = SVC()
+            self.kernel = SVC(decision_function_shape='ovr')
         elif kernel == 'logistic_regression':
-            self.kernel = LogisticRegression()
+            self.kernel = LogisticRegression(multi_class='ovr')
         elif kernel == 'random_forest':
             self.kernel = RandomForestClassifier()
         elif kernel == 'knn':
@@ -37,6 +37,10 @@ class GenericClassifier:
         else:
             raise ValueError("Invalid kernel")
 
+    def set_parameters(self, param_dict):
+        """Set the parameters of the current kernel with the given dictionary."""
+        self.kernel.set_params(**param_dict)
+        
     # Classic classifier methods
     def fit(self, X_train, y_train):
         return self.kernel.fit(X_train, y_train)
