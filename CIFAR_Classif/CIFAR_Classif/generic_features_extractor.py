@@ -1,6 +1,7 @@
 import numpy as np
 from skimage.feature import hog, local_binary_pattern
 from sklearn.decomposition import PCA
+from skimage.color import rgb2gray
 
 
 class GenericFeaturesExtractor:
@@ -12,7 +13,7 @@ class GenericFeaturesExtractor:
         if kernel == "hog":
             self.kernel = (lambda img: hog(img, orientations=8, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, channel_axis=-1))
         elif kernel == "lbp":
-            self.kernel = (lambda img: local_binary_pattern(img, 8, 1, method="uniform"))
+            self.kernel = (lambda img: local_binary_pattern(rgb2gray(img), 8, 1, method="uniform"))
         else:
             raise ValueError("Invalid kernel. Choose from: ['hog', 'lbp']")
 

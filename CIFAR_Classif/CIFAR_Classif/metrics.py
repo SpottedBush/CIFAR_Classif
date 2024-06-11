@@ -4,13 +4,14 @@ Just some simple metrics module to compare the different computed models
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 from CIFAR_Classif.generic_classifier import GenericClassifier
 from CIFAR_Classif.generic_features_extractor import GenericFeaturesExtractor
+from sklearn.metrics import confusion_matrix, roc_curve, precision_recall_curve
 
 # ------Benchmarks------
-
-def benchmark_feature_extractors(X_train, X_test, feature_extractor_list = ["hog", 'lbp']):
+def benchmark_feature_extractors(X_train, y_train, X_test, y_test, feature_extractor_list = ["hog", 'lbp'], compare_models=True, verbose=True):
     """Benchmark different feature extractors for a specific dataset.
 
     Args:
@@ -26,6 +27,11 @@ def benchmark_feature_extractors(X_train, X_test, feature_extractor_list = ["hog
         generic_features_extractor = GenericFeaturesExtractor(kernel=feature_extractor)
         X_train_features[feature_extractor] = generic_features_extractor.extract_features(X_train)
         X_test_features[feature_extractor] = generic_features_extractor.extract_features(X_test)
+        print(f"\n\n------Feature extractor tested: {feature_extractor}------")
+        accuracy, _ = benchmark_models(X_train_features[feature_extractor], y_train, X_test_features[feature_extractor], y_test, model_list = ["svc", 'logistic_regression', 'knn'], verbose=False)
+        print(f"\tAccuracy for svc: {accuracy[0]}")
+        print(f"\tAccuracy for logistic_regression: {accuracy[1]}")
+        print(f"\tAccuracy for knn: {accuracy[2]}")
     return X_train_features, X_test_features 
 
 def benchmark_models(X_train, y_train, X_test, y_test, model_list = ["svc", 'logistic_regression', 'knn'], verbose=True):
@@ -50,9 +56,8 @@ def benchmark_models(X_train, y_train, X_test, y_test, model_list = ["svc", 'log
     return accuracy_list, report_list
 
 # ------Quantitative metrics------
-
-
-def plot_feature_correlation(feature_correlation_data):
+def plot_feature_correlation(X):
+    feature_correlation_data = X.corr()
     sns.heatmap(feature_correlation_data, annot=True)
     plt.xlabel("Feature_x")
     plt.ylabel("Feature_y")
@@ -60,60 +65,41 @@ def plot_feature_correlation(feature_correlation_data):
     plt.show()
 
 
-def plot_feature_importance(feature_names, importance_values):
-    plt.bar(feature_names, importance_values)
-    plt.xlabel("Feature")
-    plt.ylabel("Importance")
-    plt.title("Feature Importance")
-    plt.xticks(rotation=90)
-    plt.show()
-
-
-def plot_confusion_matrix(confusion_matrix_data):
-    sns.heatmap(confusion_matrix_data, annot=True, fmt="d")
+def plot_confusion_matrix(y_true, y_pred, labels=None):
+    confusion_matrix_data = confusion_matrix(y_true, y_pred)
+    sns.heatmap(confusion_matrix_data, annot=True, fmt="d", xticklabels=labels, yticklabels=labels)
     plt.xlabel("Predicted Label")
     plt.ylabel("True Label")
     plt.title("Confusion Matrix")
     plt.show()
 
 
-def plot_roc_curve(false_positive_rate, true_positive_rate):
-    plt.plot(false_positive_rate, true_positive_rate)
+def plot_roc_curve(y_true, y_pred, labels=None):
+    n_classes = len(np.unique(y_true)) # Supposed to be 10 for CIFAR-10
+    for i in range(n_classes):
+        fpr, tpr, _ = roc_curve(y_true, y_pred, pos_label=i)
+        plt.plot(fpr, tpr, label=f"Class {labels[i] if labels else i}")
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
     plt.title("ROC Curve")
+    plt.legend()
     plt.show()
+    
 
-
-def plot_precision_recall_curve(recall, precision):
-    plt.plot(recall, precision)
+def plot_precision_recall_curve(y_true, y_pred, labels=None):
+    n_classes = len(np.unique(y_true)) # Supposed to be 10 for CIFAR-10
+    for i in range(n_classes):
+        precision, recall, _ = precision_recall_curve(y_true, y_pred, pos_label=i)
+        plt.plot(recall, precision, label=f"Class {labels[i] if labels else i}")
     plt.xlabel("Recall")
     plt.ylabel("Precision")
     plt.title("Precision-Recall Curve")
+    plt.legend()
     plt.show()
 
-
-def plot_learning_curve(train_sizes, train_scores_mean, test_scores_mean):
-    plt.plot(train_sizes, train_scores_mean, label="Training Accuracy")
-    plt.plot(train_sizes, test_scores_mean, label="Validation Accuracy")
-    plt.xlabel("Training Set Size")
-    plt.ylabel("Accuracy")
-    plt.title("Learning Curve")
-    plt.show()
-
-
-def plot_accuracy(accuracy_values):
-    plt.plot(accuracy_values)
-    plt.xlabel("Iteration")
-    plt.ylabel("Accuracy")
-    plt.title("Accuracy Curve")
-    plt.show()
-
-
+# In the end those were not very useful for CIFAR-10 dataset
 # ------Qualitative metrics------
-
-
-def plot_decision_boundary(x, y, z):
+def plot_decision_boundary(x, y, z): # We did not went deep on decision trees...
     plt.contourf(x, y, z, cmap="RdYlBu")
     plt.xlabel("Feature 1")
     plt.ylabel("Feature 2")
@@ -121,10 +107,7 @@ def plot_decision_boundary(x, y, z):
     plt.colorbar()
     plt.show()
 
-
 # ------Other metrics------
-
-
 def plot_feature_distribution(feature_distribution_data):
     for feature in feature_distribution_data:
         sns.histplot(feature_distribution_data[feature], kde=True)
