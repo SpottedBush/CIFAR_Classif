@@ -11,7 +11,7 @@ class GenericFeaturesExtractor:
             kernel (str, optional): Chose between ["hog", "lbp"]. Defaults to "hog".
         """
         if kernel == "hog":
-            self.kernel = (lambda img: hog(img, orientations=8, pixels_per_cell=(8, 8), cells_per_block=(1, 1), visualize=False, channel_axis=-1))
+            self.kernel = (lambda img: hog(img, orientations=8, pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False, channel_axis=-1))
         elif kernel == "lbp":
             self.kernel = (lambda img: local_binary_pattern(rgb2gray(img), 8, 1, method="uniform"))
         else:
