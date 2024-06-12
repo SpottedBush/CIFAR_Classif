@@ -12,7 +12,7 @@ from CIFAR_Classif.generic_features_extractor import GenericFeaturesExtractor
 from sklearn.metrics import confusion_matrix, roc_curve, precision_recall_curve
 
 # ------Benchmarks------
-def benchmark_feature_extractors(X_train, y_train, X_test, y_test, feature_extractor_list = ["hog", "flat"], compare_models=True, verbose=True):
+def benchmark_feature_extractors(X_train, y_train, X_test, y_test, feature_extractor_list = ["hog", "flat"], model_list=["svc", "logistic_regression", "knn"], compare_models=True, verbose=True):
     """Benchmark different feature extractors for a specific dataset.
 
     Args:
@@ -29,7 +29,7 @@ def benchmark_feature_extractors(X_train, y_train, X_test, y_test, feature_extra
         X_train_features[feature_extractor] = generic_features_extractor.extract_features(X_train)
         X_test_features[feature_extractor] = generic_features_extractor.extract_features(X_test)
         print(f"\n\n------Feature extractor tested: {feature_extractor}------")
-        accuracy, _ = benchmark_models(X_train_features[feature_extractor], y_train, X_test_features[feature_extractor], y_test, model_list = ["svc", 'logistic_regression', 'knn'], verbose=False)
+        accuracy, _ = benchmark_models(X_train_features[feature_extractor], y_train, X_test_features[feature_extractor], y_test, model_list=model_list, verbose=False)
         print(f"\tAccuracy for svc: {accuracy[0]}")
         print(f"\tAccuracy for logistic_regression: {accuracy[1]}")
         print(f"\tAccuracy for knn: {accuracy[2]}")

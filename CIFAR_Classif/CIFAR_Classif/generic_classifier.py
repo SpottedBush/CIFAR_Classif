@@ -19,7 +19,7 @@ class GenericClassifier:
             y (pd.Dataframe): Labels.
             kernel (str, optional): Must be one of the following list: ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']. Defaults to "svc".
         """
-        if kernel not in ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting', 'mlp']:
+        if kernel not in ["svc", 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']:
             raise ValueError("Invalid kernel. Choose from: ['svc', 'logistic_regression', 'random_forest', 'knn', 'decision_tree', 'gradient_boosting']")
         self.str_kernel = kernel
         if kernel == "svc":
