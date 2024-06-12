@@ -5,13 +5,14 @@ Just some simple metrics module to compare the different computed models
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from collections import Counter
 
 from CIFAR_Classif.generic_classifier import GenericClassifier
 from CIFAR_Classif.generic_features_extractor import GenericFeaturesExtractor
 from sklearn.metrics import confusion_matrix, roc_curve, precision_recall_curve
 
 # ------Benchmarks------
-def benchmark_feature_extractors(X_train, y_train, X_test, y_test, feature_extractor_list = ["hog", 'lbp'], compare_models=True, verbose=True):
+def benchmark_feature_extractors(X_train, y_train, X_test, y_test, feature_extractor_list = ["hog", "flat"], compare_models=True, verbose=True):
     """Benchmark different feature extractors for a specific dataset.
 
     Args:
@@ -56,6 +57,18 @@ def benchmark_models(X_train, y_train, X_test, y_test, model_list = ["svc", 'log
     return accuracy_list, report_list
 
 # ------Quantitative metrics------
+
+def plot_class_distribution(y_true, labels=None):
+    freqs = Counter(y_true)
+    xvals = range(len(freqs.values()))
+    colors = plt.get_cmap('tab10').colors
+    plt.figure(figsize=[13,5])
+    plt.bar(xvals, freqs.values(), tick_label=labels, color=colors)
+    plt.xlabel("Class")
+    plt.ylabel("Frequency")
+    plt.title("Class Distribution")
+    plt.show()
+
 def plot_feature_correlation(X):
     feature_correlation_data = X.corr()
     sns.heatmap(feature_correlation_data, annot=True)

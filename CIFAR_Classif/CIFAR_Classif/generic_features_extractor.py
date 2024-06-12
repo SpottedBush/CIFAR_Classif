@@ -8,14 +8,16 @@ class GenericFeaturesExtractor:
     def __init__(self, kernel="hog"):
         """Initialize the features extractor with the given kernel.
         Args:
-            kernel (str, optional): Chose between ["hog", "lbp"]. Defaults to "hog".
+            kernel (str, optional): Chose between ["hog", "lbp", "flat"]. Defaults to "hog".
         """
         if kernel == "hog":
             self.kernel = (lambda img: hog(img, orientations=8, pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False, channel_axis=-1))
         elif kernel == "lbp":
             self.kernel = (lambda img: local_binary_pattern(rgb2gray(img), 8, 1, method="uniform"))
+        elif kernel == "flat":
+            self.kernel = (lambda img: img.flatten())
         else:
-            raise ValueError("Invalid kernel. Choose from: ['hog', 'lbp']")
+            raise ValueError("Invalid kernel. Choose from: ['hog', 'lbp', 'flat']")
 
     def extract_features(self, X, features_selection=False, threshold=0.1):
         """
