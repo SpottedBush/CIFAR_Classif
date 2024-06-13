@@ -19,8 +19,13 @@ This project aims to classify the images from the CIFAR dataset.
     - Decision Tree
     - gradient_boosting
 
-- Feature 2
-- Feature 3
+- Generic Class for benchmarking multiple feature extractors
+    - Flatten
+    - Histogram of Gradient (HoG)
+    - Scale-Invarient Feature Transform (SIFT)
+    - Local Binary Pattern (LBP)
+      
+- Bag of Visual Words (BOVW)
 
 ## Requirements
 
