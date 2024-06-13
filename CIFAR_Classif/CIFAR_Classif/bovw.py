@@ -31,8 +31,8 @@ def reduce_descs_dimensions(X, n_components=64):
 
     train_cov = np.dot(X.T, X)
     eigvals, eigvecs = np.linalg.eig(train_cov)
-    perm = eigvals.argsort() # sort by increasing eigenvalue
-    pca_transform = eigvecs[:, perm[128 - n_components:128]] # eigenvectors for the n_components last eigenvalues
+    perm = eigvals.argsort()[::-1] # sort by decreasing eigenvalue
+    pca_transform = eigvecs[:, perm[:n_components]] # eigenvectors for the n_components largest eigenvalues
     return X @ pca_transform
 
 def get_bovw_features(imgs, bag):
