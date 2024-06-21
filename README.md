@@ -79,19 +79,13 @@ In order to make the notebook work, you will need to add the CIFAR dataset to th
     │
     ├── __init__.py    <- Makes CIFAR_Classif a Python module
     │
-    ├── data           <- Scripts to download or generate data
-    │   └── make_dataset.py
+    ├── bovw.py        <- Fonctions relatives to bag of visual word in the library.
     │
-    ├── features       <- Scripts to turn raw data into features for modeling
-    │   └── build_features.py
+    ├── data_preprocess.py          <- Fonctions relatives to data_preprocessing.
     │
-    ├── models         <- Scripts to train models and then use trained models to make
-    │   │                 predictions
-    │   ├── predict_model.py
-    │   └── train_model.py
+    ├── generic_classifier.py       <- Definition of the class that handles the classifiers.
     │
-    └── visualization  <- Scripts to create exploratory and results oriented visualizations
-        └── visualize.py
+    ├── generic_features_extractor.py    <- Definition of the class that handles features_extractor.
+    │
+    └── metrics.py  <- Functions related to the computing and visualization of metrics.
 ```
-
---------
